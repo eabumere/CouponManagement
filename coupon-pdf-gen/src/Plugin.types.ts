@@ -1,6 +1,7 @@
 type FieldMetadata = {
     id: string
     name: string
+    code?: string
     shortName: string
     formName: string
     disabled: boolean

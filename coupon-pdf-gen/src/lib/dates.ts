@@ -1,3 +1,5 @@
+import { DEFAULT_CONFIG } from '../constants'
+
 // Capture form date values follow the system setting keyDateFormat:
 // 'yyyy-MM-dd' (default) or 'dd-MM-yyyy'. Dates are handled as local calendar days.
 
@@ -36,8 +38,8 @@ export const parseDate = (value: unknown): Date | null => {
 }
 
 // e.g. 22 September 2026
-export const formatLong = (date: Date): string =>
-    date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+export const formatLong = (date: Date, locale = DEFAULT_CONFIG.dateLocale): string =>
+    date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 
 export const startOfToday = (): Date => {
     const now = new Date()

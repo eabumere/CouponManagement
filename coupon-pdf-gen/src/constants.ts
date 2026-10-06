@@ -1,15 +1,67 @@
-// Plugin aliases configured in the Tracker Plugin Configurator (EPOA program stage)
-export const FIELDS = {
-    mobilizerCode: 'peerMobilizerCode',
-    quantity: 'couponQuantity',
-    expiryDate: 'couponExpiryDate',
-    generationDate: 'couponGenerationDate',
-    couponNumbers: 'couponNumbers',
-    couponPdf: 'couponPdf',
-} as const
+// Default settings for the coupon plugin.
+// Every value can be overridden from the DHIS2 dataStore entry CONFIG_DATASTORE
+// (namespace/key). Values missing there (or null / empty) fall back to the ones here.
 
-// dataStore namespace holding the last issued coupon number per peer mobilizer
-export const DATASTORE_NAMESPACE = 'couponManagement'
+export const CONFIG_DATASTORE = { namespace: 'couponPdfGen', key: 'config' }
 
-export const EXPIRY_MONTHS = 3
-export const MAX_QUANTITY = 99
+export const DEFAULT_CONFIG = {
+    // Plugin aliases configured in the Tracker Plugin Configurator (EPOA program stage)
+    fields: {
+        mobilizerCode: 'peerMobilizerCode',
+        quantity: 'couponQuantity',
+        expiryDate: 'couponExpiryDate',
+        generationDate: 'couponGenerationDate',
+        couponNumbers: 'couponNumbers',
+        couponPdf: 'couponPdf',
+    },
+
+    expiryMonths: 3,
+    maxQuantity: 99,
+
+    // Keys from `fields` that must have a value before "Generate coupons" is enabled
+    requiredBeforeGenerate: ['mobilizerCode', 'quantity'],
+    // true = hide the button until ready; false = show it disabled with a hint
+    hideGenerateUntilReady: false,
+
+    // Regular expression the Peer Mobilizer Code must match, e.g. '^\\d{3}-\\d{3}$'. Empty = no check
+    mobilizerCodePattern: '',
+    mobilizerCodePatternMessage: 'Peer Mobilizer Code: expected format 101-001',
+
+    // Coupon = <parent>-<random code><sequential suffix>, e.g. 101-001-KAZ01
+    couponCode: {
+        letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        length: 3,
+        suffixDigits: 2,
+    },
+
+    // Org unit scope searched for earlier coupons (tracker API ouMode)
+    orgUnitMode: 'ACCESSIBLE',
+
+    // Locale for long dates such as "22 September 2026"
+    dateLocale: 'en-GB',
+
+    pdf: {
+        fileNamePrefix: 'EPOA_Coupons',
+        title: 'EPOA COUPON GENERATION SHEET',
+        titleColor: [84, 122, 161],
+        labels: {
+            cbo: 'Community-Based Organization (CBO)',
+            generationDate: 'Date of generation',
+            mobilizerCode: 'Peer Mobilizer Code',
+            couponCount: 'Number of Coupons Generated',
+            expiryDate: 'Coupon Expiry Date',
+            tableNumber: 'No.',
+            tableCoupon: 'Coupon Number',
+            notice: 'Important Notice',
+        },
+        notice:
+            'The Peer Mobilizer must record each coupon number on both the booklet stub and the detachable coupon. ' +
+            'Each coupon is valid for one HIV testing service only and may be used once. Coupons are strictly ' +
+            'personal, non-transferable and must be presented before the expiry date.',
+    },
+}
+
+export type CouponConfig = typeof DEFAULT_CONFIG
+export type CouponCodeFormat = CouponConfig['couponCode']
+export type PdfConfig = CouponConfig['pdf']
+export type FieldAliases = CouponConfig['fields']

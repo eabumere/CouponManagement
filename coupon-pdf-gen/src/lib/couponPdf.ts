@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf'
 import { autoTable } from 'jspdf-autotable'
+import { DEFAULT_CONFIG, PdfConfig } from '../constants'
 import { formatLong, toIsoDate } from './dates'
 import { Logo, Logos } from './logos'
 
@@ -11,17 +12,9 @@ export type CouponSheet = {
     expiryDate: Date
 }
 
-const TITLE = 'EPOA COUPON GENERATION SHEET'
-const NOTICE_LABEL = 'Important Notice'
-const NOTICE =
-    'The Peer Mobilizer must record each coupon number on both the booklet stub and the detachable coupon. ' +
-    'Each coupon is valid for one HIV testing service only and may be used once. Coupons are strictly ' +
-    'personal, non-transferable and must be presented before the expiry date.'
-
 // A4 portrait, millimetres
 const MARGIN_X = 25
 const CONTENT_WIDTH = 210 - MARGIN_X * 2
-const TITLE_COLOR: [number, number, number] = [84, 122, 161]
 const BODY_SIZE = 14
 const LINE_HEIGHT = 8
 
@@ -66,7 +59,14 @@ const drawLabelValue = (
     return y + lines.length * lineHeight
 }
 
-export const buildCouponPdf = (sheet: CouponSheet, logos: Logos): Blob => {
+export const buildCouponPdf = (
+    sheet: CouponSheet,
+    logos: Logos,
+    pdf: PdfConfig = DEFAULT_CONFIG.pdf,
+    locale = DEFAULT_CONFIG.dateLocale
+): Blob => {
+    const { labels } = pdf
+    const [r = 0, g = 0, b = 0] = pdf.titleColor
     const doc = new jsPDF({ unit: 'mm', format: 'a4' })
 
     drawLogo(doc, logos.left, 19, 56)
@@ -74,19 +74,19 @@ export const buildCouponPdf = (sheet: CouponSheet, logos: Logos): Blob => {
 
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(17)
-    doc.setTextColor(...TITLE_COLOR)
-    doc.text(TITLE, 105, 40, { align: 'center' })
+    doc.setTextColor(r, g, b)
+    doc.text(pdf.title, 105, 40, { align: 'center' })
     doc.setTextColor(0, 0, 0)
 
-    let y = drawLabelValue(doc, 'Community-Based Organization (CBO) ', sheet.cboName, 64)
-    y = drawLabelValue(doc, 'Date of generation', formatLong(sheet.generationDate), y + 14)
-    y = drawLabelValue(doc, 'Peer Mobilizer Code', sheet.mobilizerCode, y + 3)
-    drawLabelValue(doc, 'Number of Coupons Generated', String(sheet.coupons.length), y + 3)
+    let y = drawLabelValue(doc, `${labels.cbo} `, sheet.cboName, 64)
+    y = drawLabelValue(doc, labels.generationDate, formatLong(sheet.generationDate, locale), y + 14)
+    y = drawLabelValue(doc, labels.mobilizerCode, sheet.mobilizerCode, y + 3)
+    drawLabelValue(doc, labels.couponCount, String(sheet.coupons.length), y + 3)
 
     autoTable(doc, {
         startY: y + 17,
         margin: { left: MARGIN_X, right: MARGIN_X },
-        head: [['No.', 'Coupon Number']],
+        head: [[labels.tableNumber, labels.tableCoupon]],
         body: sheet.coupons.map((coupon, i) => [String(i + 1), coupon]),
         theme: 'grid',
         styles: {
@@ -107,11 +107,14 @@ export const buildCouponPdf = (sheet: CouponSheet, logos: Logos): Blob => {
         doc.addPage()
         y = 30
     }
-    y = drawLabelValue(doc, 'Coupon Expiry Date', formatLong(sheet.expiryDate), y)
-    drawLabelValue(doc, NOTICE_LABEL, NOTICE, y + 12, 11, 6)
+    y = drawLabelValue(doc, labels.expiryDate, formatLong(sheet.expiryDate, locale), y)
+    drawLabelValue(doc, labels.notice, pdf.notice, y + 12, 11, 6)
 
     return doc.output('blob')
 }
 
-export const couponPdfFileName = (mobilizerCode: string, generationDate: Date) =>
-    `EPOA_Coupons_${mobilizerCode}_${toIsoDate(generationDate)}.pdf`
+export const couponPdfFileName = (
+    mobilizerCode: string,
+    generationDate: Date,
+    prefix = DEFAULT_CONFIG.pdf.fileNamePrefix
+) => `${prefix}_${mobilizerCode}_${toIsoDate(generationDate)}.pdf`

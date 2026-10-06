@@ -6,7 +6,6 @@ const config = {
     description: 'A DHIS2 app for coupon selection and PDF generation.',
 
     entryPoints: {
-        app: './src/DevHarness.tsx',
         plugin: './src/Plugin.tsx',
     },
 
