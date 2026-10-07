@@ -242,6 +242,10 @@ all defaults are used.
 | `pdf.labels.tableCoupon` | `Coupon Number` | Table header |
 | `pdf.labels.notice` | `Important Notice` | Notice heading |
 | `pdf.notice` | *(the notice paragraph)* | Notice text at the bottom of the PDF |
+| `view.labels.redeemed` | `Redeemed` | Coupon table column (plugin view only) |
+| `view.labels.redeemedAt` | `Redeemed on` | Coupon table column (plugin view only) |
+| `view.labels.yes` / `view.labels.no` | `Yes` / `No` | Redeemed status text |
+| `view.labels.summary` | `Redeemed: {count} of {total}` | Summary above the coupon table |
 
 The CBO name on the sheet is the **display name of the event's organisation unit**. The two logos
 are the image files in `src/assets/` (`usaid-flag.png`, `epic-logo.png`). To change them, replace
@@ -282,7 +286,8 @@ the files and rebuild.
    save"** message.
 5. Click Capture's **Save**. Coupons are stored only when the event is saved. Unsaved coupons are
    discarded.
-6. Reopen the saved event at any time to see the coupons and use **Preview PDF** or **Download
+6. Reopen the saved event at any time to see the coupons, their redemption status (**Redeemed**,
+   **Redeemed on**, and a "Redeemed: X of N" summary) and use **Preview PDF** or **Download
    PDF**. These buttons are disabled until the event has been saved.
 
 Once an event has coupons, **Generate coupons** is no longer shown on that event, so coupons are

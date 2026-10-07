@@ -60,7 +60,8 @@ const Plugin = ({
     const storedCode = asString(values?.[FIELDS.mobilizerCode])
     const storedQuantity = asString(values?.[FIELDS.quantity])
     const storedExpiry = isoFromFormDate(values?.[FIELDS.expiryDate])
-    const coupons = parseCoupons(values?.[FIELDS.couponNumbers]).map((c) => c.clientCoupon)
+    const couponRecords = parseCoupons(values?.[FIELDS.couponNumbers])
+    const coupons = couponRecords.map((c) => c.clientCoupon)
     const generated = coupons.length > 0
 
     // Inputs live in the regular Capture fields mapped to the plugin; read them as-is
@@ -195,6 +196,7 @@ const Plugin = ({
             {sheet && (
                 <CouponSheetView
                     sheet={sheet}
+                    records={couponRecords}
                     config={config}
                     busy={busy}
                     unsaved={generatedNow}

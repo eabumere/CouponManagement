@@ -39,6 +39,18 @@ export const DEFAULT_CONFIG = {
     // Locale for long dates such as "22 September 2026"
     dateLocale: 'en-GB',
 
+    // Coupon table shown in the plugin (not the PDF)
+    view: {
+        labels: {
+            redeemed: 'Redeemed',
+            redeemedAt: 'Redeemed on',
+            yes: 'Yes',
+            no: 'No',
+            // {count} and {total} are replaced with numbers
+            summary: 'Redeemed: {count} of {total}',
+        },
+    },
+
     pdf: {
         fileNamePrefix: 'EPOA_Coupons',
         title: 'EPOA COUPON GENERATION SHEET',
