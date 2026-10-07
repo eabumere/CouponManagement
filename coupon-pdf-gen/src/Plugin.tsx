@@ -1,6 +1,6 @@
 // src/Plugin.tsx
 // EPOA coupon generator: Capture form field plugin for the EPOA program stage.
-import { Button, CircularLoader, NoticeBox } from '@dhis2/ui'
+import { CircularLoader, NoticeBox } from '@dhis2/ui'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
     CouponForm,
@@ -13,7 +13,6 @@ import { CouponConfig } from './constants'
 import { useConfig } from './hooks/useConfig'
 import { useIssuedCoupons } from './hooks/useIssuedCoupons'
 import { useServerInfo } from './hooks/useServerInfo'
-import { useUploadPdf } from './hooks/useUploadPdf'
 import {
     buildCouponNumbers,
     parseCoupons,
@@ -54,7 +53,6 @@ const Plugin = ({
         fieldsMetadata?.[FIELDS.couponNumbers] ?? {},
         config.orgUnitMode
     )
-    const uploadPdf = useUploadPdf()
 
     const configured = useMemo(() => new Set(Object.keys(fieldsMetadata ?? {})), [fieldsMetadata])
     const missingAliases = Object.values(FIELDS).filter((alias) => !configured.has(alias))
@@ -63,7 +61,6 @@ const Plugin = ({
     const storedQuantity = asString(values?.[FIELDS.quantity])
     const storedExpiry = isoFromFormDate(values?.[FIELDS.expiryDate])
     const coupons = parseCoupons(values?.[FIELDS.couponNumbers]).map((c) => c.clientCoupon)
-    const hasPdf = !!values?.[FIELDS.couponPdf]
     const generated = coupons.length > 0
 
     // Inputs live in the regular Capture fields mapped to the plugin; read them as-is
@@ -118,11 +115,6 @@ const Plugin = ({
           }
         : null
 
-    const attachPdf = async (couponSheet: CouponSheet) => {
-        const blob = await createPdf(couponSheet, config)
-        setField(FIELDS.couponPdf, await uploadPdf(blob, pdfFileName(couponSheet, config)))
-    }
-
     const run = async (task: () => Promise<void>) => {
         setBusy(true)
         setError(null)
@@ -154,14 +146,6 @@ const Plugin = ({
             setField(FIELDS.generationDate, toFormDate(today, dateFormat))
             setField(FIELDS.couponNumbers, serializeCoupons(toCouponRecords(newCoupons)))
             setGeneratedNow(true)
-
-            await attachPdf({
-                cboName,
-                mobilizerCode: code,
-                coupons: newCoupons,
-                generationDate: today,
-                expiryDate: parseDate(form.expiryDate) as Date,
-            })
         })
     }
 
@@ -207,14 +191,6 @@ const Plugin = ({
                 </NoticeBox>
             )}
 
-            {sheet && !hasPdf && !busy && (
-                <NoticeBox warning title="Coupon PDF not attached">
-                    Coupon numbers were generated, but the PDF was not uploaded.{' '}
-                    <Button small onClick={() => run(() => attachPdf(sheet))}>
-                        Upload PDF again
-                    </Button>
-                </NoticeBox>
-            )}
 
             {sheet && (
                 <CouponSheetView

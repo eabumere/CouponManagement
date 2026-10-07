@@ -138,7 +138,7 @@ describe('config', () => {
             expiryMonths: 6,
             maxQuantity: null, // not provided -> default
             dateLocale: '', // empty -> default
-            fields: { couponPdf: 'pdfFile' },
+            fields: { couponNumbers: 'issuedCoupons' },
             pdf: { title: 'NEW TITLE', titleColor: [0, 0, 0], labels: { notice: 'Note' } },
             couponCode: { length: '4' }, // wrong type -> default
             unknownKey: 'ignored',
@@ -146,7 +146,7 @@ describe('config', () => {
         expect(config.expiryMonths).toBe(6)
         expect(config.maxQuantity).toBe(DEFAULT_CONFIG.maxQuantity)
         expect(config.dateLocale).toBe(DEFAULT_CONFIG.dateLocale)
-        expect(config.fields).toEqual({ ...DEFAULT_CONFIG.fields, couponPdf: 'pdfFile' })
+        expect(config.fields).toEqual({ ...DEFAULT_CONFIG.fields, couponNumbers: 'issuedCoupons' })
         expect(config.pdf.title).toBe('NEW TITLE')
         expect(config.pdf.titleColor).toEqual([0, 0, 0])
         expect(config.pdf.labels).toEqual({ ...DEFAULT_CONFIG.pdf.labels, notice: 'Note' })

@@ -12,7 +12,6 @@ export const DEFAULT_CONFIG = {
         expiryDate: 'couponExpiryDate',
         generationDate: 'couponGenerationDate',
         couponNumbers: 'couponNumbers',
-        couponPdf: 'couponPdf',
     },
 
     expiryMonths: 3,
